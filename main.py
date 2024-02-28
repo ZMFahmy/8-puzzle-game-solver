@@ -8,3 +8,4 @@ print("Original state")
 p.print_puzzle()
 
 solve_puzzle(p)
+###########################
