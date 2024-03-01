@@ -115,7 +115,7 @@ def get_transition_models(state):
     return transition_models
 
 
-def solve_puzzle(puzzle):
+def solve_puzzle(puzzle, screen):
     goal_state = [
             ["0", "1", "2"],
             ["3", "4", "5"],
@@ -128,7 +128,7 @@ def solve_puzzle(puzzle):
     visited_nodes.append(root)
 
     for child_state in root.children:
-        child_as_puzzle = Puzzle()
+        child_as_puzzle = Puzzle(screen)
         child_as_puzzle.set_state(child_state)
         child_node = Node(child_as_puzzle)
         child_node.heuristic_cost += root.heuristic_cost
@@ -146,10 +146,10 @@ def solve_puzzle(puzzle):
 
         # expanding node with the least heuristic cost
         node_to_expand = frontier.pop(min_index)
-        node_in_puzzle_form = Puzzle()
+        node_in_puzzle_form = Puzzle(screen)
         node_in_puzzle_form.set_state(node_to_expand.state)
         for child_state in node_to_expand.children:
-            child_as_puzzle = Puzzle()
+            child_as_puzzle = Puzzle(screen)
             child_as_puzzle.set_state(child_state)
             child_node = Node(child_as_puzzle)
             child_node.heuristic_cost += root.heuristic_cost
