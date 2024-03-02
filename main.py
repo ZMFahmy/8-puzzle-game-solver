@@ -7,6 +7,10 @@ p.shuffle_puzzle()
 
 print("Original state")
 p.print_puzzle()
+state=[["4","3","1"],
+       ["5","0","2"],
+       ["6","7","8"]]
+p.set_state(state)
 
 visited_nodes = solve_puzzle(p)
 
