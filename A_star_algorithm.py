@@ -115,6 +115,13 @@ def get_transition_models(state):
     return transition_models
 
 
+def get_visited_nodes_states(visited_nodes):
+    states = []
+    for i in range(len(visited_nodes)):
+        states.append(visited_nodes[i].state)
+    return states
+
+
 def solve_puzzle(puzzle):
     goal_state = [
             ["0", "1", "2"],
@@ -146,6 +153,7 @@ def solve_puzzle(puzzle):
 
         # expanding node with the least heuristic cost
         node_to_expand = frontier.pop(min_index)
+        visited_nodes.append(node_to_expand)
         node_in_puzzle_form = Puzzle()
         node_in_puzzle_form.set_state(node_to_expand.state)
         for child_state in node_to_expand.children:
@@ -160,7 +168,7 @@ def solve_puzzle(puzzle):
 
         if node_to_expand.state == goal_state:
             print("Puzzle solved successfully")
-            return
+            return get_visited_nodes_states(visited_nodes)
 
         trial_no += 1
     print("Failed to solve puzzle")
