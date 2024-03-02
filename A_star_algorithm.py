@@ -115,7 +115,14 @@ def get_transition_models(state):
     return transition_models
 
 
-def solve_puzzle(puzzle, screen):
+def get_visited_nodes_states(visited_nodes):
+    states = []
+    for i in range(len(visited_nodes)):
+        states.append(visited_nodes[i].state)
+    return states
+
+
+def solve_puzzle(puzzle):
     goal_state = [
             ["0", "1", "2"],
             ["3", "4", "5"],
@@ -128,7 +135,7 @@ def solve_puzzle(puzzle, screen):
     visited_nodes.append(root)
 
     for child_state in root.children:
-        child_as_puzzle = Puzzle(screen)
+        child_as_puzzle = Puzzle()
         child_as_puzzle.set_state(child_state)
         child_node = Node(child_as_puzzle)
         child_node.heuristic_cost += root.heuristic_cost
@@ -146,10 +153,11 @@ def solve_puzzle(puzzle, screen):
 
         # expanding node with the least heuristic cost
         node_to_expand = frontier.pop(min_index)
-        node_in_puzzle_form = Puzzle(screen)
+        visited_nodes.append(node_to_expand)
+        node_in_puzzle_form = Puzzle()
         node_in_puzzle_form.set_state(node_to_expand.state)
         for child_state in node_to_expand.children:
-            child_as_puzzle = Puzzle(screen)
+            child_as_puzzle = Puzzle()
             child_as_puzzle.set_state(child_state)
             child_node = Node(child_as_puzzle)
             child_node.heuristic_cost += root.heuristic_cost
@@ -160,7 +168,7 @@ def solve_puzzle(puzzle, screen):
 
         if node_to_expand.state == goal_state:
             print("Puzzle solved successfully")
-            return
+            return get_visited_nodes_states(visited_nodes)
 
         trial_no += 1
     print("Failed to solve puzzle")
