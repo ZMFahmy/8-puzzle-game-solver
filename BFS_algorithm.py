@@ -113,8 +113,7 @@ class DFSNode:
     def __init__(self,puzzle):
         self.state=puzzle.state
         self.children=get_children(self.state)
-        self.depth=1
-
+        self.depth=0
 
 
 
@@ -125,7 +124,7 @@ def visit(p,visited_nodes,frontier):
 
 
     print_mat(p)
-    if p.depth>22:
+    if p.depth>19:
         return False
     visited_nodes.append(p)
     if is_matrix_in_list(p.state, SOLUTION):
@@ -165,7 +164,7 @@ def solve_puzzleDFS(puzzle):
         # pu.print_puzzle()
     solveable=False
     while len(frontier)>0:
-        if visit(frontier.pop(), visited_nodes, frontier):
+        if visit(frontier.pop(0), visited_nodes, frontier):
             solveable=True
             break
 
@@ -184,10 +183,10 @@ def solve_puzzleDFS(puzzle):
 
 p = Puzzle()
 p.shuffle_puzzle()
-state=[["1","2","0"],
-       ["3","4","5"],
-       ["6","7","8"]]
-p.set_state(state)
+# state=[["1","2","0"],
+#        ["3","4","5"],
+#        ["6","7","8"]]
+# p.set_state(state)
 
 print(solve_puzzleDFS(p))
 
