@@ -22,7 +22,7 @@ class Puzzle:
     def shuffle_puzzle(self):
         flag = False
 
-        for n in range(10):
+        for n in range(30):
             for i in range(3):
                 for j in range(3):
                     if self.state[i][j] == "0":

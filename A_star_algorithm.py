@@ -2,10 +2,11 @@ from puzzle import Puzzle
 
 
 class Node:
-    def __init__(self, puzzle):
+    def __init__(self, puzzle, parent):
         self.state = puzzle.state
         self.heuristic_cost = get_heuristic_cost(self.state)
         self.children = get_transition_models(self.state)
+        self.parent = parent
 
 
 def get_heuristic_cost(state):
@@ -122,6 +123,14 @@ def get_visited_nodes_states(visited_nodes):
     return states
 
 
+def get_path_to_goal(node):
+    path = []  # path from end to start
+    while node is not None:
+        path.append(node.state)
+        node = node.parent
+    return path[::-1]  # reversed to get correct sequence from start to end
+
+
 def solve_puzzle(puzzle):
     goal_state = [
             ["0", "1", "2"],
@@ -131,18 +140,27 @@ def solve_puzzle(puzzle):
     visited_nodes = []
     frontier = []
 
-    root = Node(puzzle)
+    root = Node(puzzle, None)
     visited_nodes.append(root)
+    if root.state == goal_state:
+        return get_path_to_goal(root)
 
     for child_state in root.children:
         child_as_puzzle = Puzzle()
         child_as_puzzle.set_state(child_state)
-        child_node = Node(child_as_puzzle)
+        child_node = Node(child_as_puzzle, root)
         child_node.heuristic_cost += root.heuristic_cost
         frontier.append(child_node)
 
     trial_no = 1
     while len(frontier) > 0:
+        """
+        print("frontier: ")
+        for obj in frontier:
+            print(obj.state)
+            print(obj.heuristic_cost)
+        """
+
         # getting node with the least cost
         min_cost = frontier[0].heuristic_cost
         min_index = 0
@@ -159,16 +177,30 @@ def solve_puzzle(puzzle):
         for child_state in node_to_expand.children:
             child_as_puzzle = Puzzle()
             child_as_puzzle.set_state(child_state)
-            child_node = Node(child_as_puzzle)
+            child_node = Node(child_as_puzzle, node_to_expand)
             child_node.heuristic_cost += root.heuristic_cost
-            frontier.append(child_node)
 
-        print(f"\nState no: {trial_no}")
+            exists_in_frontier_or_visited = False
+            for node in frontier:
+                if node.state == child_state:
+                    exists_in_frontier_or_visited = True
+                    break
+
+            for node in visited_nodes:
+                if node.state == child_state:
+                    exists_in_frontier_or_visited = True
+                    break
+
+            if not exists_in_frontier_or_visited:
+                frontier.append(child_node)
+
+        print(f"\nExplored State no: {trial_no}")
         node_in_puzzle_form.print_puzzle()
 
         if node_to_expand.state == goal_state:
             print("Puzzle solved successfully")
-            return get_visited_nodes_states(visited_nodes)
+            # return get_visited_nodes_states(visited_nodes)
+            return get_path_to_goal(node_to_expand)
 
         trial_no += 1
     print("Failed to solve puzzle")

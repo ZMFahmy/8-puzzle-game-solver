@@ -1,12 +1,30 @@
+import pygame
 import tkinter as tk
+from tkinter import ttk
+
+
+def state_button_sound():
+    pygame.mixer.init()
+    pygame.mixer.music.load("assets/camera_shutter_state_button.mp3")  # Replace "sound_effect.wav" with your sound file
+    pygame.mixer.music.play()
+
+
+def algo_select_button_sound():
+    pygame.mixer.init()
+    pygame.mixer.music.load("assets/algo_select_pan_hit.mp3")  # Replace "sound_effect.wav" with your sound file
+    pygame.mixer.music.play()
+
+
+def initial_state_validate(d, i, P, s, S, v, V, W):
+    return len(P) <= 9
 
 
 class GUI:
-    def __init__(self, A_star_states):
+    def __init__(self, A_star_path):
         self.screen = tk.Tk()
-        self.screen.title("Bordered Tile")
+        self.screen.title("8 Puzzle")
         self.canvas = tk.Canvas(self.screen, width=800, height=500)
-        self.A_star_states = A_star_states
+        self.A_star_states = A_star_path
         self.current_state = 1
         self.selected_strategy = ""
 
@@ -52,42 +70,74 @@ class GUI:
         self.canvas.create_text(text_x, text_y, text=str(number), font=("Helvetica", 35, "bold"), fill="black")
 
     def back_button_command(self):
+        state_button_sound()
         if self.current_state != 1:
             self.current_state -= 1
             self.canvas.delete("all")
             self.create_layout()
 
     def forward_button_command(self):
+        state_button_sound()
         if self.current_state != len(self.A_star_states):
             self.current_state += 1
             self.canvas.delete("all")
             self.create_layout()
 
     def bfs_button_command(self):
+        algo_select_button_sound()
         self.selected_strategy = "bfs"
         self.current_state = 1
         self.canvas.delete("all")
         self.create_layout()
 
     def dfs_button_command(self):
+        algo_select_button_sound()
         self.selected_strategy = "dfs"
         self.current_state = 1
         self.canvas.delete("all")
         self.create_layout()
 
     def a_star_button_command(self):
+        algo_select_button_sound()
         self.selected_strategy = "A*"
         self.current_state = 1
         self.canvas.delete("all")
         self.create_layout()
 
     def create_layout(self):
+        # Create initial state input area
+        initial_state_input_label_x = 200
+        initial_state_input_label_y = 40
+        initial_state_input_label_text = "Enter Initial Puzzle State:"
+        initial_state_input_label = tk.Label(self.screen, text=initial_state_input_label_text, font=("Helvetica", 14, "bold"))
+        selected_strategy_label_window = self.canvas.create_window(initial_state_input_label_x, initial_state_input_label_y, window=initial_state_input_label)
+
+        initial_state_entry_x = 375
+        initial_state_entry_y = 40
+        validate_cmd = self.screen.register(initial_state_validate)
+        initial_state_entry = ttk.Entry(self.screen, width=10, font=("Helvetica", 14, "bold"), validate="key", validatecommand=(validate_cmd, '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W'))
+        initial_state_entry_window = self.canvas.create_window(initial_state_entry_x, initial_state_entry_y, window=initial_state_entry)
+
+        create_button_x = 530
+        create_button_y = 40
+        create_button_width = 13
+        create_button_height = 2
+        create_button = tk.Button(self.screen, text="Create Puzzle", font=("Helvetica", 12, "bold"), width=create_button_width, height=create_button_height, activebackground="CadetBlue3", background="CadetBlue1", borderwidth=2)
+        self.canvas.create_window(create_button_x, create_button_y, window=create_button)
+
+        random_button_x = 692
+        random_button_y = 40
+        random_button_width = 13
+        random_button_height = 2
+        random_button = tk.Button(self.screen, text="Random Puzzle", font=("Helvetica", 12, "bold"), width=random_button_width, height=random_button_height, activebackground="turquoise3", background="turquoise1", borderwidth=2)
+        self.canvas.create_window(random_button_x, random_button_y, window=random_button)
+
+        # Create main puzzle container
         container_x = 80
         container_y = 80
         container_width = 430
         container_height = 430
-        self.canvas.create_rectangle(container_x, container_y, container_width, container_height,
-                                     outline="purple1", width=6, fill="purple4")
+        self.canvas.create_rectangle(container_x, container_y, container_width, container_height, outline="purple1", width=6, fill="purple4")
 
         # Create the bordered tiles
         tile_x = 100
