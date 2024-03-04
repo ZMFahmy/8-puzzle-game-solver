@@ -2,7 +2,6 @@ from puzzle import Puzzle
 
 import copy
 import random
-MAX_DEPTH=20
 
 count = 0
 SOLUTION=[[
@@ -114,6 +113,7 @@ class DFSNode:
         self.state=puzzle.state
         self.children=get_children(self.state)
         self.depth=1
+        self.parent=None
 
 
 
@@ -121,12 +121,12 @@ class DFSNode:
 import time
 def visit(p,visited_nodes,frontier):
     # time.sleep(5)
-    print(len(visited_nodes))
+    if len(visited_nodes)%1000==0:
+        print(len(visited_nodes))
 
 
-    print_mat(p)
-    if p.depth>22:
-        return False
+    # print_mat(p)
+
     visited_nodes.append(p)
     if is_matrix_in_list(p.state, SOLUTION):
         print("done")
@@ -141,6 +141,7 @@ def visit(p,visited_nodes,frontier):
                 continue
             y=DFSNode(pu)
             y.depth=p.depth+1
+            y.parent=node
             frontier.append(y)
 
 
@@ -160,8 +161,9 @@ def solve_puzzleDFS(puzzle):
         pu=Puzzle()
         # print("#########")
         pu.set_state(child)
-
-        frontier.append(DFSNode(pu))
+        ch=DFSNode(pu)
+        ch.parent=root
+        frontier.append(ch)
         # pu.print_puzzle()
     solveable=False
     while len(frontier)>0:
@@ -173,7 +175,12 @@ def solve_puzzleDFS(puzzle):
     if solveable==True:
         print("solved succesfully ")
         print(visited_nodes[-1].depth)
-        print_mat(visited_nodes[0])
+        current=visited_nodes[-1]
+        while current.parent:
+            print_mat(current)
+            print("###########################")
+            current=current.parent
+
     else:
         print("unable to solve")
 
@@ -184,10 +191,7 @@ def solve_puzzleDFS(puzzle):
 
 p = Puzzle()
 p.shuffle_puzzle()
-state=[["1","2","0"],
-       ["3","4","5"],
-       ["6","7","8"]]
-p.set_state(state)
+
 
 print(solve_puzzleDFS(p))
 
