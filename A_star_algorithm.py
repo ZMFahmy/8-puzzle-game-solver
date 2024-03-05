@@ -131,7 +131,7 @@ def get_path_to_goal(node):
     return path[::-1]  # reversed to get correct sequence from start to end
 
 
-def solve_puzzle(puzzle):
+def solve_puzzle_A_star(puzzle):
     goal_state = [
             ["0", "1", "2"],
             ["3", "4", "5"],
@@ -198,9 +198,9 @@ def solve_puzzle(puzzle):
         node_in_puzzle_form.print_puzzle()
 
         if node_to_expand.state == goal_state:
-            print("Puzzle solved successfully")
+            print("Puzzle solved successfully with A*")
             # return get_visited_nodes_states(visited_nodes)
             return get_path_to_goal(node_to_expand)
 
         trial_no += 1
-    print("Failed to solve puzzle")
+    print("Failed to solve puzzle with A*")
