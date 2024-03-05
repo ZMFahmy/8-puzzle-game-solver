@@ -178,7 +178,7 @@ def solve_puzzleBFS(puzzle):
         current=visited_nodes[-1]
         while current.parent:
             # print_mat(current)
-            path.append(current.state)
+            path.insert(0,current.state)
             # print("###########################")
 
             current=current.parent
@@ -193,11 +193,6 @@ def solve_puzzleBFS(puzzle):
 
 
 
-p = Puzzle()
-p.shuffle_puzzle()
 
-w=solve_puzzleBFS(p)
-print(len(w))
-print(((w)))
 
 
