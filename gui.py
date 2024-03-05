@@ -1,8 +1,10 @@
 import pygame
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from puzzle import Puzzle
 from A_star_algorithm import solve_puzzle_A_star
+from BFS_algorithm import solve_puzzleBFS
+from DFS_Algorithm import solve_puzzleDFS
 
 
 def state_button_sound():
@@ -21,6 +23,24 @@ def initial_state_validate(d, i, P, s, S, v, V, W):
     return len(P) <= 9
 
 
+def is_solvable(word):
+    s = list(word)
+    count = 0
+    for i in range(0, len(s) - 1):
+        for j in range(i, len(s)):
+            if s[j] < s[i]:
+                count += 1
+    if count % 2 == 0:
+        if set(word) == set("012345678"):
+            return True
+        else:
+            messagebox.showinfo("Alert.....", "Entered puzzle format must be a variation of the distinct numbers from 0 to 9.")
+            return False
+    else:
+        messagebox.showinfo("Alert.....", "Entered puzzle format isn't solvable.")
+        return False
+
+
 class GUI:
     def __init__(self):
         self.screen = tk.Tk()
@@ -29,9 +49,11 @@ class GUI:
         self.initial_state_entry = None
         self.puzzle = Puzzle()
         self.created_puzzle = False
+        self.is_loading = False
         self.BFS_states = []
         self.DFS_states = []
-        self.A_star_states = []
+        self.A_star_manhattan_states = []
+        self.A_star_euclidean_states = []
         self.current_state = 1
         self.selected_strategy = ""
         self.initial_state = [
@@ -90,30 +112,53 @@ class GUI:
 
     def forward_button_command(self):
         state_button_sound()
-        if self.current_state != len(self.A_star_states):
+        if (self.selected_strategy == "A* Manhattan" and self.current_state != len(self.A_star_manhattan_states)) or (self.selected_strategy == "A* Euclidean" and self.current_state != len(self.A_star_euclidean_states)) or (self.selected_strategy == "BFS" and self.current_state != len(self.BFS_states)) or (self.selected_strategy == "DFS" and self.current_state != len(self.DFS_states)):
             self.current_state += 1
             self.canvas.delete("all")
             self.create_layout()
 
     def bfs_button_command(self):
         algo_select_button_sound()
-        self.selected_strategy = "bfs"
+        self.is_loading = True
+        self.canvas.delete("all")
+        self.create_layout()
+        if len(self.BFS_states) == 0:
+            self.BFS_states = solve_puzzleBFS(self.puzzle)
+            self.BFS_states.insert(0, self.puzzle.state)
+        self.is_loading = False
+        self.selected_strategy = "BFS"
         self.current_state = 1
         self.canvas.delete("all")
         self.create_layout()
 
     def dfs_button_command(self):
         algo_select_button_sound()
-        self.selected_strategy = "dfs"
+        self.is_loading = True
+        self.canvas.delete("all")
+        self.create_layout()
+        if len(self.DFS_states) == 0:
+            self.DFS_states = solve_puzzleDFS(self.puzzle)
+            self.DFS_states.insert(0, self.puzzle.state)
+        self.is_loading = False
+        self.selected_strategy = "DFS"
         self.current_state = 1
         self.canvas.delete("all")
         self.create_layout()
 
-    def a_star_button_command(self):
+    def a_star_manhattan_button_command(self):
         algo_select_button_sound()
-        if len(self.A_star_states) == 0:
-            self.A_star_states = solve_puzzle_A_star(self.puzzle)
-        self.selected_strategy = "A*"
+        if len(self.A_star_manhattan_states) == 0:
+            self.A_star_manhattan_states = solve_puzzle_A_star(self.puzzle, "Manhattan")
+        self.selected_strategy = "A* Manhattan"
+        self.current_state = 1
+        self.canvas.delete("all")
+        self.create_layout()
+
+    def a_star_euclidean_button_command(self):
+        algo_select_button_sound()
+        if len(self.A_star_euclidean_states) == 0:
+            self.A_star_euclidean_states = solve_puzzle_A_star(self.puzzle, "Euclidean")
+        self.selected_strategy = "A* Euclidean"
         self.current_state = 1
         self.canvas.delete("all")
         self.create_layout()
@@ -121,19 +166,23 @@ class GUI:
     def create_custom_puzzle(self):
         input_line = self.initial_state_entry.get()
         if len(input_line) == 9:
-            self.puzzle.state = [
-                list(input_line[0:3]),
-                list(input_line[3:6]),
-                list(input_line[6:9]),
-            ]
-            self.puzzle.print_puzzle()
-            self.created_puzzle = True
-            self.selected_strategy = ""
-            self.BFS_states = []
-            self.DFS_states = []
-            self.A_star_states = []
-            self.canvas.delete("all")
-            self.create_layout()
+            if is_solvable(input_line):
+                self.puzzle.state = [
+                    list(input_line[0:3]),
+                    list(input_line[3:6]),
+                    list(input_line[6:9]),
+                ]
+                self.puzzle.print_puzzle()
+                self.created_puzzle = True
+                self.selected_strategy = ""
+                self.BFS_states = []
+                self.DFS_states = []
+                self.A_star_manhattan_states = []
+                self.A_star_euclidean_states = []
+                self.canvas.delete("all")
+                self.create_layout()
+        else:
+            messagebox.showinfo("Alert.....", "Entered puzzle format must be all 9 numbers from 0 to 8.")
 
     def create_random_puzzle(self):
         self.puzzle = Puzzle()
@@ -143,7 +192,8 @@ class GUI:
         self.selected_strategy = ""
         self.BFS_states = []
         self.DFS_states = []
-        self.A_star_states = []
+        self.A_star_manhattan_states = []
+        self.A_star_euclidean_states = []
         self.canvas.delete("all")
         self.create_layout()
 
@@ -189,11 +239,41 @@ class GUI:
         tile_height = 100
         tile_radius = 30
         if self.created_puzzle:
-            if self.selected_strategy == "A*":
+            if self.selected_strategy == "A* Manhattan":
                 for i in range(3):
                     for j in range(3):
-                        if self.A_star_states[self.current_state - 1][i][j] != "0":
-                            self.create_tile(tile_x, tile_y, tile_width, tile_radius, tile_height, self.A_star_states[self.current_state - 1][i][j])
+                        if self.A_star_manhattan_states[self.current_state - 1][i][j] != "0":
+                            self.create_tile(tile_x, tile_y, tile_width, tile_radius, tile_height, self.A_star_manhattan_states[self.current_state - 1][i][j])
+
+                        tile_x += 105
+                    tile_x = 100
+                    tile_y += 105
+
+            elif self.selected_strategy == "A* Euclidean":
+                for i in range(3):
+                    for j in range(3):
+                        if self.A_star_euclidean_states[self.current_state - 1][i][j] != "0":
+                            self.create_tile(tile_x, tile_y, tile_width, tile_radius, tile_height, self.A_star_euclidean_states[self.current_state - 1][i][j])
+
+                        tile_x += 105
+                    tile_x = 100
+                    tile_y += 105
+
+            elif self.selected_strategy == "BFS":
+                for i in range(3):
+                    for j in range(3):
+                        if self.BFS_states[self.current_state - 1][i][j] != "0":
+                            self.create_tile(tile_x, tile_y, tile_width, tile_radius, tile_height, self.BFS_states[self.current_state - 1][i][j])
+
+                        tile_x += 105
+                    tile_x = 100
+                    tile_y += 105
+
+            elif self.selected_strategy == "DFS":
+                for i in range(3):
+                    for j in range(3):
+                        if self.DFS_states[self.current_state - 1][i][j] != "0":
+                            self.create_tile(tile_x, tile_y, tile_width, tile_radius, tile_height, self.DFS_states[self.current_state - 1][i][j])
 
                         tile_x += 105
                     tile_x = 100
@@ -219,71 +299,92 @@ class GUI:
                 tile_y += 105
 
         if self.created_puzzle:
-            # Create algorithm selection section
-            algo_container_x = 460
-            algo_container_y = 80
-            algo_container_width = 300
-            algo_container_height = 270
-            self.canvas.create_rectangle(algo_container_x, algo_container_y, algo_container_x + algo_container_width, algo_container_y + algo_container_height, outline="black", width=2)
-            algo_title_label_text = "Select a solving strategy"
-            algo_title_label = tk.Label(self.screen, text=algo_title_label_text, font=("Helvetica", 18, "bold"))
-            algo_title_label_window = self.canvas.create_window(algo_container_x + algo_container_width / 2, algo_container_y + 20, window=algo_title_label)
+            if self.is_loading:
+                loading_container_x = 460
+                loading_container_y = 80
+                loading_container_width = 300
+                loading_container_height = 270
+                self.canvas.create_rectangle(loading_container_x, loading_container_y, loading_container_x + loading_container_width, loading_container_y + loading_container_height, outline="black", width=2)
+                loading_title_label_text = "Loading ..."
+                loading_title_label = tk.Label(self.screen, text=loading_title_label_text, font=("Helvetica", 18, "bold"))
+                loading_title_label_window = self.canvas.create_window(loading_container_x + loading_container_width / 2, loading_container_y + 20, window=loading_title_label)
+            else:
+                # Create algorithm selection section
+                algo_container_x = 460
+                algo_container_y = 80
+                algo_container_width = 300
+                algo_container_height = 270
+                self.canvas.create_rectangle(algo_container_x, algo_container_y, algo_container_x + algo_container_width, algo_container_y + algo_container_height, outline="black", width=2)
+                algo_title_label_text = "Select a solving strategy"
+                algo_title_label = tk.Label(self.screen, text=algo_title_label_text, font=("Helvetica", 18, "bold"))
+                algo_title_label_window = self.canvas.create_window(algo_container_x + algo_container_width / 2, algo_container_y + 20, window=algo_title_label)
 
-            bfs_button_x = 610
-            bfs_button_y = 150
-            bfs_button_width = 20
-            bfs_button_height = 2
-            bfs_button = tk.Button(self.screen, text="Breadth First Search", font=("Helvetica", 12, "bold"), width=bfs_button_width, height=bfs_button_height, activebackground="MediumOrchid3", background="MediumOrchid1", borderwidth=2, command=self.bfs_button_command)
-            self.canvas.create_window(bfs_button_x, bfs_button_y, window=bfs_button)
+                bfs_button_x = 610
+                bfs_button_y = 145
+                bfs_button_width = 20
+                bfs_button_height = 2
+                bfs_button = tk.Button(self.screen, text="Breadth First Search", font=("Helvetica", 12, "bold"), width=bfs_button_width, height=bfs_button_height, activebackground="MediumOrchid3", background="MediumOrchid1", borderwidth=2, command=self.bfs_button_command)
+                self.canvas.create_window(bfs_button_x, bfs_button_y, window=bfs_button)
 
-            dfs_button_x = 610
-            dfs_button_y = 220
-            dfs_button_width = 20
-            dfs_button_height = 2
-            dfs_button = tk.Button(self.screen, text="Depth First Search", font=("Helvetica", 12, "bold"), width=dfs_button_width, height=dfs_button_height, activebackground="DarkOrchid3", background="DarkOrchid1", borderwidth=2, command=self.dfs_button_command)
-            self.canvas.create_window(dfs_button_x, dfs_button_y, window=dfs_button)
+                dfs_button_x = 610
+                dfs_button_y = 200
+                dfs_button_width = 20
+                dfs_button_height = 2
+                dfs_button = tk.Button(self.screen, text="Depth First Search", font=("Helvetica", 12, "bold"), width=dfs_button_width, height=dfs_button_height, activebackground="DarkOrchid3", background="DarkOrchid1", borderwidth=2, command=self.dfs_button_command)
+                self.canvas.create_window(dfs_button_x, dfs_button_y, window=dfs_button)
 
-            a_star_button_x = 610
-            a_star_button_y = 290
-            a_star_button_width = 20
-            a_star_button_height = 2
-            a_star_button = tk.Button(self.screen, text="A* Algorithm", font=("Helvetica", 12, "bold"), width=a_star_button_width, height=a_star_button_height, activebackground="purple3", background="purple1", borderwidth=2, command=self.a_star_button_command)
-            self.canvas.create_window(a_star_button_x, a_star_button_y, window=a_star_button)
+                a_star_manhattan_button_x = 610
+                a_star_manhattan_button_y = 255
+                a_star_manhattan_button_width = 20
+                a_star_manhattan_button_height = 2
+                a_star_manhattan_button = tk.Button(self.screen, text="A* (Manhattan)", font=("Helvetica", 12, "bold"), width=a_star_manhattan_button_width, height=a_star_manhattan_button_height, activebackground="purple3", background="purple1", borderwidth=2, command=self.a_star_manhattan_button_command)
+                self.canvas.create_window(a_star_manhattan_button_x, a_star_manhattan_button_y, window=a_star_manhattan_button)
 
-            # Create buttons
-            if self.selected_strategy == "A*":
-                back_button_x = 500
-                back_button_y = 400
-                back_arrow_image = tk.PhotoImage(file="assets/back_arrow.png")
-                back_button = tk.Button(self.screen, image=back_arrow_image, borderwidth=0, command=self.back_button_command)
-                back_button.image = back_arrow_image  # Keep a reference to the image to prevent garbage collection
-                self.canvas.create_window(back_button_x, back_button_y, window=back_button)
+                a_star_euclidean_button_x = 610
+                a_star_euclidean_button_y = 310
+                a_star_euclidean_button_width = 20
+                a_star_euclidean_button_height = 2
+                a_star_euclidean_button = tk.Button(self.screen, text="A* (Euclidean)", font=("Helvetica", 12, "bold"), width=a_star_euclidean_button_width, height=a_star_euclidean_button_height, activebackground="purple3", background="purple1", borderwidth=2, command=self.a_star_euclidean_button_command)
+                self.canvas.create_window(a_star_euclidean_button_x, a_star_euclidean_button_y, window=a_star_euclidean_button)
 
-                back_button_x = 720
-                back_button_y = 400
-                back_arrow_image = tk.PhotoImage(file="assets/forward_arrow.png")
-                back_button = tk.Button(self.screen, image=back_arrow_image, borderwidth=0, command=self.forward_button_command)
-                back_button.image = back_arrow_image  # Keep a reference to the image to prevent garbage collection
-                self.canvas.create_window(back_button_x, back_button_y, window=back_button)
+                # Create buttons
+                if self.selected_strategy != "":
+                    back_button_x = 500
+                    back_button_y = 400
+                    back_arrow_image = tk.PhotoImage(file="assets/back_arrow.png")
+                    back_button = tk.Button(self.screen, image=back_arrow_image, borderwidth=0, command=self.back_button_command)
+                    back_button.image = back_arrow_image  # Keep a reference to the image to prevent garbage collection
+                    self.canvas.create_window(back_button_x, back_button_y, window=back_button)
 
-                # Create state number label
-                label_x = 540
-                label_y = 360
-                label_width = 140
-                label_height = 80
-                self.canvas.create_rectangle(label_x, label_y, label_x + label_width, label_y + label_height, outline="black", width=2)
+                    back_button_x = 720
+                    back_button_y = 400
+                    back_arrow_image = tk.PhotoImage(file="assets/forward_arrow.png")
+                    back_button = tk.Button(self.screen, image=back_arrow_image, borderwidth=0, command=self.forward_button_command)
+                    back_button.image = back_arrow_image  # Keep a reference to the image to prevent garbage collection
+                    self.canvas.create_window(back_button_x, back_button_y, window=back_button)
 
-                if self.selected_strategy == "A*":
-                    states_limit = len(self.A_star_states)
-                else:
-                    states_limit = 0
+                    # Create state number label
+                    label_x = 540
+                    label_y = 360
+                    label_width = 140
+                    label_height = 80
+                    self.canvas.create_rectangle(label_x, label_y, label_x + label_width, label_y + label_height, outline="black", width=2)
 
-                label_text = f"{self.current_state} / {states_limit}"
-                label = tk.Label(self.screen, text=label_text, font=("Helvetica", 18, "bold"))
-                label_window = self.canvas.create_window(label_x + label_width / 2, label_y + label_height / 2, window=label)
+                    if self.selected_strategy == "A* Manhattan":
+                        states_limit = len(self.A_star_manhattan_states)
+                    elif self.selected_strategy == "A* Euclidean":
+                        states_limit = len(self.A_star_euclidean_states)
+                    elif self.selected_strategy == "BFS":
+                        states_limit = len(self.BFS_states)
+                    else:
+                        states_limit = len(self.DFS_states)
 
-                selected_strategy_label_x = 610
-                selected_strategy_label_y = 470
-                selected_strategy_label_text = f"Selected Strategy: {self.selected_strategy}"
-                selected_strategy_label = tk.Label(self.screen, text=selected_strategy_label_text, font=("Helvetica", 14, "bold"))
-                selected_strategy_label_window = self.canvas.create_window(selected_strategy_label_x, selected_strategy_label_y, window=selected_strategy_label)
+                    label_text = f"{self.current_state} / {states_limit}"
+                    label = tk.Label(self.screen, text=label_text, font=("Helvetica", 18, "bold"))
+                    label_window = self.canvas.create_window(label_x + label_width / 2, label_y + label_height / 2, window=label)
+
+                    selected_strategy_label_x = 610
+                    selected_strategy_label_y = 470
+                    selected_strategy_label_text = f"Selected Strategy: {self.selected_strategy}"
+                    selected_strategy_label = tk.Label(self.screen, text=selected_strategy_label_text, font=("Helvetica", 14, "bold"))
+                    selected_strategy_label_window = self.canvas.create_window(selected_strategy_label_x, selected_strategy_label_y, window=selected_strategy_label)

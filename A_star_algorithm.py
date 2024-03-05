@@ -1,37 +1,67 @@
+import math
+
 from puzzle import Puzzle
 
 
 class Node:
-    def __init__(self, puzzle, parent):
+    def __init__(self, puzzle, parent, cost_to_reach_node, metric_type):
         self.state = puzzle.state
-        self.heuristic_cost = get_heuristic_cost(self.state)
+        self.cost_to_reach_node = cost_to_reach_node
+        self.heuristic_cost = get_heuristic_cost(self.state, metric_type)
         self.children = get_transition_models(self.state)
         self.parent = parent
 
 
-def get_heuristic_cost(state):
+def get_heuristic_cost(state, metric_type):
     cost = 0
 
-    for i in range(3):
-        for j in range(3):
-            tile_content = state[i][j]
+    if metric_type == "Manhattan":
+        for i in range(3):
+            for j in range(3):
+                tile_content = state[i][j]
 
-            if tile_content == "1":
-                cost += abs(i - 0) + abs(j - 1)
-            elif tile_content == "2":
-                cost += abs(i - 0) + abs(j - 2)
-            elif tile_content == "3":
-                cost += abs(i - 1) + abs(j - 0)
-            elif tile_content == "4":
-                cost += abs(i - 1) + abs(j - 1)
-            elif tile_content == "5":
-                cost += abs(i - 1) + abs(j - 2)
-            elif tile_content == "6":
-                cost += abs(i - 2) + abs(j - 0)
-            elif tile_content == "7":
-                cost += abs(i - 2) + abs(j - 1)
-            elif tile_content == "8":
-                cost += abs(i - 2) + abs(j - 2)
+                if tile_content == "0":
+                    cost += abs(i - 0) + abs(j - 0)
+                elif tile_content == "1":
+                    cost += abs(i - 0) + abs(j - 1)
+                elif tile_content == "2":
+                    cost += abs(i - 0) + abs(j - 2)
+                elif tile_content == "3":
+                    cost += abs(i - 1) + abs(j - 0)
+                elif tile_content == "4":
+                    cost += abs(i - 1) + abs(j - 1)
+                elif tile_content == "5":
+                    cost += abs(i - 1) + abs(j - 2)
+                elif tile_content == "6":
+                    cost += abs(i - 2) + abs(j - 0)
+                elif tile_content == "7":
+                    cost += abs(i - 2) + abs(j - 1)
+                elif tile_content == "8":
+                    cost += abs(i - 2) + abs(j - 2)
+    else:
+        for i in range(3):
+            for j in range(3):
+                tile_content = state[i][j]
+
+                if tile_content == "0":
+                    cost += math.sqrt((i - 0)**2 + (j - 0)**2)
+                elif tile_content == "1":
+                    cost += math.sqrt((i - 0)**2 + (j - 1)**2)
+                elif tile_content == "2":
+                    cost += math.sqrt((i - 0)**2 + (j - 2)**2)
+                elif tile_content == "3":
+                    cost += math.sqrt((i - 1)**2 + (j - 0)**2)
+                elif tile_content == "4":
+                    cost += math.sqrt((i - 1)**2 + (j - 1)**2)
+                elif tile_content == "5":
+                    cost += math.sqrt((i - 1)**2 + (j - 2)**2)
+                elif tile_content == "6":
+                    cost += math.sqrt((i - 2)**2 + (j - 0)**2)
+                elif tile_content == "7":
+                    cost += math.sqrt((i - 2)**2 + (j - 1)**2)
+                elif tile_content == "8":
+                    cost += math.sqrt((i - 2)**2 + (j - 2)**2)
+
 
     return cost
 
@@ -131,7 +161,7 @@ def get_path_to_goal(node):
     return path[::-1]  # reversed to get correct sequence from start to end
 
 
-def solve_puzzle_A_star(puzzle):
+def solve_puzzle_A_star(puzzle, metric_type):
     goal_state = [
             ["0", "1", "2"],
             ["3", "4", "5"],
@@ -140,7 +170,7 @@ def solve_puzzle_A_star(puzzle):
     visited_nodes = []
     frontier = []
 
-    root = Node(puzzle, None)
+    root = Node(puzzle, None, 0, metric_type)
     visited_nodes.append(root)
     if root.state == goal_state:
         return get_path_to_goal(root)
@@ -148,25 +178,18 @@ def solve_puzzle_A_star(puzzle):
     for child_state in root.children:
         child_as_puzzle = Puzzle()
         child_as_puzzle.set_state(child_state)
-        child_node = Node(child_as_puzzle, root)
+        child_node = Node(child_as_puzzle, root, root.cost_to_reach_node + 1, metric_type)
         child_node.heuristic_cost += root.heuristic_cost
         frontier.append(child_node)
 
     trial_no = 1
     while len(frontier) > 0:
-        """
-        print("frontier: ")
-        for obj in frontier:
-            print(obj.state)
-            print(obj.heuristic_cost)
-        """
-
         # getting node with the least cost
-        min_cost = frontier[0].heuristic_cost
+        min_cost = frontier[0].heuristic_cost + frontier[0].cost_to_reach_node
         min_index = 0
         for i in range(len(frontier)):
-            if frontier[i].heuristic_cost < min_cost:
-                min_cost = frontier[i].heuristic_cost
+            if frontier[i].heuristic_cost + frontier[i].cost_to_reach_node < min_cost:
+                min_cost = frontier[i].heuristic_cost + frontier[i].cost_to_reach_node
                 min_index = i
 
         # expanding node with the least heuristic cost
@@ -177,8 +200,7 @@ def solve_puzzle_A_star(puzzle):
         for child_state in node_to_expand.children:
             child_as_puzzle = Puzzle()
             child_as_puzzle.set_state(child_state)
-            child_node = Node(child_as_puzzle, node_to_expand)
-            child_node.heuristic_cost += root.heuristic_cost
+            child_node = Node(child_as_puzzle, node_to_expand, node_to_expand.cost_to_reach_node + 1, metric_type)
 
             exists_in_frontier_or_visited = False
             for node in frontier:

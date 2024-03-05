@@ -187,13 +187,3 @@ def solve_puzzleDFS(puzzle):
         print("unable to solve")
 
         print_mat(visited_nodes[0])
-
-
-
-
-p = Puzzle()
-p.shuffle_puzzle()
-
-
-print(solve_puzzleDFS(p))
-
