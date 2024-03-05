@@ -1,4 +1,3 @@
-from DFS_Algorithm import DFSNode
 from puzzle import Puzzle
 
 import copy
@@ -109,7 +108,7 @@ def get_children(state):
 
 
 
-class BFSNode:
+class DFSNode:
     def __init__(self,puzzle):
         self.state=puzzle.state
         self.children=get_children(self.state)
@@ -145,7 +144,7 @@ def visit(p,visited_nodes,frontier):
             frontier.append(y)
 
 
-def solve_puzzle_BFS(puzzle):
+def solve_puzzleBFS(puzzle):
     goal_state = [
             ["0", "1", "2"],
             ["3", "4", "5"],
@@ -197,7 +196,8 @@ def solve_puzzle_BFS(puzzle):
 p = Puzzle()
 p.shuffle_puzzle()
 
-
-print(solve_puzzle_BFS(p))
+w=solve_puzzleBFS(p)
+print(len(w))
+print(((w)))
 
 

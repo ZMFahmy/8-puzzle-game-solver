@@ -121,6 +121,8 @@ class DFSNode:
 import time
 def visit(p,visited_nodes,frontier):
     # time.sleep(5)
+    # if p.depth>25:
+    #     return False
     if len(visited_nodes)%1000==0:
         print(len(visited_nodes))
 
