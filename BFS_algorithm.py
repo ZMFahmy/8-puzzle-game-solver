@@ -28,8 +28,12 @@ def is_matrix_Visited(matrix, list_of_matrices):
   # Check if any matrix in the list is equal to the given matrix
   for other_matrix in list_of_matrices:
     # print_mat(other_matrix)
-    if all(all(a == b for a,  b in zip(row1, row2)) for row1, row2 in zip(matrix, other_matrix.state)):
-      return True
+    st=other_matrix.state
+    for i in range(0,3):
+        for j in range(0,3):
+            if matrix[i][j]!=st[i][j]:
+                return False
+    return True
 
   return False
 
