@@ -31,19 +31,16 @@ def initial_state_validate(d, i, P, s, S, v, V, W):
 
 def is_solvable(word):
     s = list(word)
+    # print(word)
     count = 0
     for i in range(0, len(s) - 1):
         for j in range(i, len(s)):
-            if s[j] < s[i]:
+            if s[j] < s[i] and s[j] != "0" and s[i] != "0":
                 count += 1
-    if True:
-        if set(word) == set("012345678"):
-            return True
-        else:
-            messagebox.showinfo("Alert.....", "Entered puzzle format must be a variation of the distinct numbers from 0 to 9.")
-            return False
-    else:
-        messagebox.showinfo("Alert.....", "Entered puzzle format isn't solvable.")
+    print(count)
+    if count % 2 == 0:
+        return True
+    if count % 2 == 1:
         return False
 
 
