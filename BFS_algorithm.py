@@ -184,7 +184,7 @@ def solve_puzzleBFS(puzzle):
         # pu.print_puzzle()
     solveable=False
     path=[]
-    path.append(root.state)
+    # path.append(root.state)
     while len(frontier)>0:
         if visit(frontier.pop(0), visited_nodes, frontier):
             solveable=True
