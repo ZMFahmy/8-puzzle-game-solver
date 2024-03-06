@@ -138,8 +138,8 @@ def visit(p,visited_nodes,frontier):
     # if len(visited_nodes)%1000==0:
     #     print(len(visited_nodes))
 
-
-    # print_mat(p)
+    print("exploring node ",len(visited_nodes))
+    print_mat(p)
     visited_nodes.append(p)
     if is_matrix_in_list(p.state, SOLUTION):
         # print("done")
@@ -222,11 +222,11 @@ def solve_puzzleBFS(puzzle):
 
 #
 #
-# import time
-#
+import time
+
 # p=Puzzle()
 # print(p.state)
-# p.set_state([["1",'2','3'],['4','5','6'],['7','8','0']])
+# p.set_state([["1",'2','0'],['3','4','5'],['6','7','8']])
 # print(p.state)
 # t1=time.time()
 # x=solve_puzzleBFS(p)
