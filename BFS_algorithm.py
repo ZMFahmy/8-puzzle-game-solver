@@ -35,25 +35,25 @@ def is_matrix_Visited(matrix, list_of_matrices):
 
 
 def get_children(state):
-    row =0
-    column=0
-    children=[]
-    for i in range(0,3):
-        for j in range(0,3):
-            if state[i][j]=="0":
-                row=i
-                column=j
+    row = 0
+    column = 0
+    children = []
+    for i in range(0, 3):
+        for j in range(0, 3):
+            if state[i][j] == "0":
+                row = i
+                column = j
                 break
-        if state[i][j] == "0":
+        if state[row][column] == "0":
             row = i
             column = j
             break
-    if (row==0 or row==2) and (column==0 or column==2):
-        temp1=copy.deepcopy(state)
-        temp2=copy.deepcopy(state)
-        temp1[row][column],temp1[abs(row-1)][column]=temp1[abs(row-1)][column],temp1[row][column]
+    if (row == 0 or row == 2) and (column == 0 or column == 2):
+        temp1 = copy.deepcopy(state)
+        temp2 = copy.deepcopy(state)
+        temp1[row][column], temp1[abs(row - 1)][column] = temp1[abs(row - 1)][column], temp1[row][column]
 
-        temp2[row][column], temp2[row][abs(column-1)] = temp2[row][abs(column-1)], temp2[row][column]
+        temp2[row][column], temp2[row][abs(column - 1)] = temp2[row][abs(column - 1)], temp2[row][column]
         list = []
         list.append(temp1)
         list.append(temp2)
@@ -61,11 +61,11 @@ def get_children(state):
             index = random.randrange(len(list))
             children.append(list.pop(index))
 
-    elif (row==1) and (column==1):
-        temp1=copy.deepcopy(state)
-        temp1[row][column],temp1[(row-1)][column]=temp1[(row-1)][column],temp1[row][column]
+    elif (row == 1) and (column == 1):
+        temp1 = copy.deepcopy(state)
+        temp1[row][column], temp1[(row - 1)][column] = temp1[(row - 1)][column], temp1[row][column]
         temp2 = copy.deepcopy(state)
-        temp2[row][column], temp2[row][(column-1)] = temp2[row][(column-1)], temp2[row][column]
+        temp2[row][column], temp2[row][(column - 1)] = temp2[row][(column - 1)], temp2[row][column]
         list = []
         list.append(temp1)
         list.append(temp2)
@@ -76,27 +76,42 @@ def get_children(state):
         temp4[row][column], temp4[row][(column + 1)] = temp4[row][(column + 1)], temp4[row][column]
         list.append(temp3)
         list.append(temp4)
-        for i in range(0,4):
+        for i in range(0, 4):
             index = random.randrange(len(list))
             children.append(list.pop(index))
     else:
-        temp1 = copy.deepcopy(state)
-        temp1[row][column], temp1[abs(row - 1)][column] = temp1[abs(row - 1)][column], temp1[row][column]
-        temp2 = copy.deepcopy(state)
-        temp2[row][column], temp2[row][abs(column - 1)] = temp2[row][abs(column - 1)], temp2[row][column]
-        list=[]
-        list.append(temp1)
-        list.append(temp2)
-        index = random.randrange(len(list))
+        # temp1 = copy.deepcopy(state)
+        # temp1[row][column], temp1[abs(row - 1)][column] = temp1[abs(row - 1)][column], temp1[row][column]
+        # temp2 = copy.deepcopy(state)
+        # temp2[row][column], temp2[row][abs(column - 1)] = temp2[row][abs(column - 1)], temp2[row][column]
+        # list = []
+        # list.append(temp1)
+        # list.append(temp2)
+        # index = random.randrange(len(list))
 
-
-        if column==1:
+        if column == 1:
             temp3 = copy.deepcopy(state)
-            temp3[row][column], temp3[row][(column + 1)] = temp3[row][(column + 1)], temp3[row][column]
+            temp3[row][column], temp3[row][2] = temp3[row][2], temp3[row][column]
+            temp1 = copy.deepcopy(state)
+            temp1[row][column], temp1[1][1] = temp1[1][1], temp1[row][column]
+            temp2 = copy.deepcopy(state)
+            temp2[row][column], temp2[row][column - 1] = temp2[row][column - 1], temp2[row][column]
+            list = []
+            list.append(temp1)
+            list.append(temp2)
+            # index = random.randrange(len(list))
 
-        elif row==1:
+        elif row == 1:
             temp3 = copy.deepcopy(state)
-            temp3[row][column], temp3[row+1][column] = temp3[row+1][column], temp3[row][column]
+            temp3[row][column], temp3[2][column] = temp3[2][column], temp3[row][column]
+            temp1 = copy.deepcopy(state)
+            temp1 = copy.deepcopy(state)
+            temp1[row][column], temp1[1][1] = temp1[1][1], temp1[row][column]
+            temp2 = copy.deepcopy(state)
+            temp2[row][column], temp2[row - 1][abs(column)] = temp2[row - 1][abs(column)], temp2[row][column]
+        list = []
+
+        # index = random.randrange(len(list))
 
         list.append(temp3)
         list.append(temp1)
@@ -105,7 +120,6 @@ def get_children(state):
             index = random.randrange(len(list))
             children.append(list.pop(index))
     return children
-
 
 
 class DFSNode:
@@ -170,6 +184,7 @@ def solve_puzzleBFS(puzzle):
         # pu.print_puzzle()
     solveable=False
     path=[]
+    path.append(root.state)
     while len(frontier)>0:
         if visit(frontier.pop(0), visited_nodes, frontier):
             solveable=True
@@ -180,6 +195,16 @@ def solve_puzzleBFS(puzzle):
         # print("solved succesfully ")
         # print(visited_nodes[-1].depth)
         current=visited_nodes[-1]
+        # for i in range(0,len(visited_nodes)):
+        #     dep=0
+        #     l=[]
+        #
+        #     nod=visited_nodes.pop(0)
+        #     if nod.depth>dep:
+        #         print(l)
+        #         dep+=1
+        #     l.append(nod)
+
         while current.parent:
             # print_mat(current)
             path.insert(0,current.state)
@@ -197,11 +222,17 @@ def solve_puzzleBFS(puzzle):
 
 
 
+import time
+
+p=Puzzle()
+print(p.state)
+p.set_state([["1",'2','3'],['4','5','6'],['7','8','0']])
+print(p.state)
+t1=time.time()
+x=solve_puzzleBFS(p)
+print(len(x),x)
+
+t2=time.time()
+print(t2-t1)
 
 
-# p=Puzzle()
-# print(p.state)
-# p.set_state([['1','0','3'],['2','4','5'],['6','7','8']])
-# print(p.state)
-# print(solve_puzzleBFS(p))
-#
