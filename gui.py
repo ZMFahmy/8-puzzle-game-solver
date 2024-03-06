@@ -7,15 +7,21 @@ from BFS_algorithm import solve_puzzleBFS
 from DFS_Algorithm import solve_puzzleDFS
 
 
+def generate_puzzle_sound():
+    pygame.mixer.init()
+    pygame.mixer.music.load("assets/piuw.mp3")  # Replace "sound_effect.wav" with your sound file
+    pygame.mixer.music.play()
+
+
 def state_button_sound():
     pygame.mixer.init()
-    pygame.mixer.music.load("assets/camera_shutter_state_button.mp3")  # Replace "sound_effect.wav" with your sound file
+    pygame.mixer.music.load("assets/discord-notification.mp3")  # Replace "sound_effect.wav" with your sound file
     pygame.mixer.music.play()
 
 
 def algo_select_button_sound():
     pygame.mixer.init()
-    pygame.mixer.music.load("assets/algo_select_pan_hit.mp3")  # Replace "sound_effect.wav" with your sound file
+    pygame.mixer.music.load("assets/mac-quack.mp3")  # Replace "sound_effect.wav" with your sound file
     pygame.mixer.music.play()
 
 
@@ -30,7 +36,7 @@ def is_solvable(word):
         for j in range(i, len(s)):
             if s[j] < s[i]:
                 count += 1
-    if count % 2 == 0:
+    if True:
         if set(word) == set("012345678"):
             return True
         else:
@@ -164,6 +170,7 @@ class GUI:
         self.create_layout()
 
     def create_custom_puzzle(self):
+        generate_puzzle_sound()
         input_line = self.initial_state_entry.get()
         if len(input_line) == 9:
             if is_solvable(input_line):
@@ -185,8 +192,10 @@ class GUI:
             messagebox.showinfo("Alert.....", "Entered puzzle format must be all 9 numbers from 0 to 8.")
 
     def create_random_puzzle(self):
+        generate_puzzle_sound()
         self.puzzle = Puzzle()
         self.puzzle.shuffle_puzzle()
+        print("Original state:")
         self.puzzle.print_puzzle()
         self.created_puzzle = True
         self.selected_strategy = ""
@@ -344,7 +353,7 @@ class GUI:
                 a_star_euclidean_button_y = 310
                 a_star_euclidean_button_width = 20
                 a_star_euclidean_button_height = 2
-                a_star_euclidean_button = tk.Button(self.screen, text="A* (Euclidean)", font=("Helvetica", 12, "bold"), width=a_star_euclidean_button_width, height=a_star_euclidean_button_height, activebackground="purple3", background="purple1", borderwidth=2, command=self.a_star_euclidean_button_command)
+                a_star_euclidean_button = tk.Button(self.screen, text="A* (Euclidean)", font=("Helvetica", 12, "bold"), width=a_star_euclidean_button_width, height=a_star_euclidean_button_height, activebackground="MediumPurple3", background="MediumPurple1", borderwidth=2, command=self.a_star_euclidean_button_command)
                 self.canvas.create_window(a_star_euclidean_button_x, a_star_euclidean_button_y, window=a_star_euclidean_button)
 
                 # Create buttons

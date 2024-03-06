@@ -1,15 +1,16 @@
 import math
-
 from puzzle import Puzzle
+import time
 
 
 class Node:
-    def __init__(self, puzzle, parent, cost_to_reach_node, metric_type):
+    def __init__(self, puzzle, parent, cost_to_reach_node, metric_type, depth):
         self.state = puzzle.state
         self.cost_to_reach_node = cost_to_reach_node
         self.heuristic_cost = get_heuristic_cost(self.state, metric_type)
         self.children = get_transition_models(self.state)
         self.parent = parent
+        self.depth = depth
 
 
 def get_heuristic_cost(state, metric_type):
@@ -61,7 +62,6 @@ def get_heuristic_cost(state, metric_type):
                     cost += math.sqrt((i - 2)**2 + (j - 1)**2)
                 elif tile_content == "8":
                     cost += math.sqrt((i - 2)**2 + (j - 2)**2)
-
 
     return cost
 
@@ -162,6 +162,7 @@ def get_path_to_goal(node):
 
 
 def solve_puzzle_A_star(puzzle, metric_type):
+    start_time = time.time()
     goal_state = [
             ["0", "1", "2"],
             ["3", "4", "5"],
@@ -170,7 +171,7 @@ def solve_puzzle_A_star(puzzle, metric_type):
     visited_nodes = []
     frontier = []
 
-    root = Node(puzzle, None, 0, metric_type)
+    root = Node(puzzle, None, 0, metric_type, 0)
     visited_nodes.append(root)
     if root.state == goal_state:
         return get_path_to_goal(root)
@@ -178,7 +179,7 @@ def solve_puzzle_A_star(puzzle, metric_type):
     for child_state in root.children:
         child_as_puzzle = Puzzle()
         child_as_puzzle.set_state(child_state)
-        child_node = Node(child_as_puzzle, root, root.cost_to_reach_node + 1, metric_type)
+        child_node = Node(child_as_puzzle, root, root.cost_to_reach_node + 1, metric_type, root.depth + 1)
         child_node.heuristic_cost += root.heuristic_cost
         frontier.append(child_node)
 
@@ -200,7 +201,7 @@ def solve_puzzle_A_star(puzzle, metric_type):
         for child_state in node_to_expand.children:
             child_as_puzzle = Puzzle()
             child_as_puzzle.set_state(child_state)
-            child_node = Node(child_as_puzzle, node_to_expand, node_to_expand.cost_to_reach_node + 1, metric_type)
+            child_node = Node(child_as_puzzle, node_to_expand, node_to_expand.cost_to_reach_node + 1, metric_type, node_to_expand.depth + 1)
 
             exists_in_frontier_or_visited = False
             for node in frontier:
@@ -216,11 +217,16 @@ def solve_puzzle_A_star(puzzle, metric_type):
             if not exists_in_frontier_or_visited:
                 frontier.append(child_node)
 
-        print(f"\nExplored State no: {trial_no}")
+        print(f"\nExplored Node no: {trial_no}")
         node_in_puzzle_form.print_puzzle()
 
         if node_to_expand.state == goal_state:
-            print("Puzzle solved successfully with A*")
+            end_time = time.time()
+            print(f"Puzzle solved successfully with A* {metric_type}")
+            print(f"Path cost = {node_to_expand.cost_to_reach_node}")
+            print(f"Search depth = {node_to_expand.depth}")
+            print(f"Running time = {end_time - start_time}")
+            print("///////////////////////////////////////////////////////////")
             # return get_visited_nodes_states(visited_nodes)
             return get_path_to_goal(node_to_expand)
 
