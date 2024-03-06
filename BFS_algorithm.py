@@ -220,19 +220,19 @@ def solve_puzzleBFS(puzzle):
         print_mat(visited_nodes[0])
 
 
-
-
-import time
-
-p=Puzzle()
-print(p.state)
-p.set_state([["1",'2','3'],['4','5','6'],['7','8','0']])
-print(p.state)
-t1=time.time()
-x=solve_puzzleBFS(p)
-print(len(x),x)
-
-t2=time.time()
-print(t2-t1)
+#
+#
+# import time
+#
+# p=Puzzle()
+# print(p.state)
+# p.set_state([["1",'2','3'],['4','5','6'],['7','8','0']])
+# print(p.state)
+# t1=time.time()
+# x=solve_puzzleBFS(p)
+# print(len(x),x)
+#
+# t2=time.time()
+# print(t2-t1)
 
 
