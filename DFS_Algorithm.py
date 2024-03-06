@@ -180,6 +180,7 @@ def solve_puzzleDFS(puzzle):
 
     visited_nodes = []
     VisitedSet = set()
+    FrontierSet = set()
 
     frontier = []
     root = DFSNode(puzzle)

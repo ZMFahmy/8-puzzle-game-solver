@@ -177,7 +177,7 @@ def solve_puzzleBFS(puzzle):
             ["3", "4", "5"],
             ["6", "7", "8"],
     ]
-
+    t1=time.time()
     visited_nodes = []
     VisitedSet = set()
 
@@ -197,6 +197,7 @@ def solve_puzzleBFS(puzzle):
         ch=DFSNode(pu)
         ch.parent=root
         frontier.append(ch)
+
         # pu.print_puzzle()
     solveable=False
     path=[]
@@ -211,6 +212,10 @@ def solve_puzzleBFS(puzzle):
         # print("solved succesfully ")
         # print(visited_nodes[-1].depth)
         current=visited_nodes[-1]
+        t2=time.time()
+        dddepth=current.depth
+        print("time taken for BFS = ",t2-t1)
+        print("the height is ", dddepth)
         # for i in range(0,len(visited_nodes)):
         #     dep=0
         #     l=[]
