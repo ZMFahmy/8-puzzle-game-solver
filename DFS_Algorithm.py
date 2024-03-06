@@ -10,6 +10,14 @@ SOLUTION=[[
             ["6", "7", "8"],
     ]]
 
+def reshape(matrix):
+    l=[]
+    for i in range(0,3):
+        for j in range(0, 3):
+            l.append(matrix[i][j])
+    # print(l)
+    w= ''.join(l)
+    return w
 
 def print_mat(matrix):
     matrix=matrix.state
@@ -137,14 +145,15 @@ class DFSNode:
 
 
 import time
-def visit(p,visited_nodes,frontier):
+def visit(p,visited_nodes,frontier,VisitedSet):
     # time.sleep(5)
     # if len(visited_nodes)%1000==0:
     #     print(len(visited_nodes))
 
-
+    # print("exploring node ",len(visited_nodes))
     # print_mat(p)
     visited_nodes.append(p)
+    VisitedSet.add(reshape(p.state))
     if is_matrix_in_list(p.state, SOLUTION):
         # print("done")
         return True
@@ -154,7 +163,7 @@ def visit(p,visited_nodes,frontier):
         for child in node.children:
             pu = Puzzle()
             pu.set_state(child)
-            if is_matrix_Visited(child,frontier) or is_matrix_Visited(child,visited_nodes) :
+            if is_matrix_Visited(child,frontier) or reshape(child) in VisitedSet :
                 continue
             y=DFSNode(pu)
             y.depth=p.depth+1
@@ -170,10 +179,13 @@ def solve_puzzleDFS(puzzle):
     ]
 
     visited_nodes = []
+    VisitedSet = set()
+
     frontier = []
     root = DFSNode(puzzle)
     root.depth=1
     visited_nodes.append(root)
+    VisitedSet.add(reshape(root.state))
     path=[]
     if is_matrix_in_list(root.state,SOLUTION):
         path.append(root.state)
@@ -190,7 +202,7 @@ def solve_puzzleDFS(puzzle):
     path=[]
     # path.append(root.state)
     while len(frontier)>0:
-        if visit(frontier.pop(), visited_nodes, frontier):
+        if visit(frontier.pop(), visited_nodes, frontier,VisitedSet):
             solveable=True
             break
 
@@ -224,19 +236,19 @@ def solve_puzzleDFS(puzzle):
         print_mat(visited_nodes[0])
 
 
-
-
+#
+#
 import time
 
 # p=Puzzle()
 # print(p.state)
-# p.set_state([["3",'1','2'],['0','4','5'],['6','7','8']])
+# p.set_state([["1",'2','0'],['3','4','5'],['6','7','8']])
 # print(p.state)
 # t1=time.time()
-# x=solve_puzzleDFS(p)
+# x=solve_puzzleBFS(p)
 # print(len(x),x)
 #
 # t2=time.time()
 # print(t2-t1)
-#
+
 
