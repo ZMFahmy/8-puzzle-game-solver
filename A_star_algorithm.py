@@ -1,5 +1,6 @@
 import math
 from puzzle import Puzzle
+from heapq import heappush, heappop
 import time
 
 
@@ -44,7 +45,7 @@ def get_heuristic_cost(state, metric_type):
                 tile_content = state[i][j]
 
                 #if tile_content == "0":
-                 #   cost += math.sqrt((i - 0)**2 + (j - 0)**2)
+                #   cost += math.sqrt((i - 0)**2 + (j - 0)**2)
                 if tile_content == "1":
                     cost += math.sqrt((i - 0)**2 + (j - 1)**2)
                 elif tile_content == "2":
@@ -168,8 +169,9 @@ def solve_puzzle_A_star(puzzle, metric_type):
             ["6", "7", "8"],
     ]
     visited_nodes = []
-    frontier = []
+    frontier = []  # heapq with items being tuples in the format (heuristic_cost, frontier_insertion_count, node)
     search_depth = 0
+    frontier_insertion_count = 1
 
     root = Node(puzzle, None, 0, metric_type)
     visited_nodes.append(root)
@@ -180,21 +182,13 @@ def solve_puzzle_A_star(puzzle, metric_type):
         child_as_puzzle = Puzzle()
         child_as_puzzle.set_state(child_state)
         child_node = Node(child_as_puzzle, root, root.cost_to_reach_node + 1, metric_type)
-        child_node.heuristic_cost += root.heuristic_cost
-        frontier.append(child_node)
+        heappush(frontier, (child_node.heuristic_cost + child_node.cost_to_reach_node, frontier_insertion_count, child_node))
+        frontier_insertion_count += 1
 
     trial_no = 1
     while len(frontier) > 0:
-        # getting node with the least cost
-        min_cost = frontier[0].heuristic_cost + frontier[0].cost_to_reach_node
-        min_index = 0
-        for i in range(len(frontier)):
-            if frontier[i].heuristic_cost + frontier[i].cost_to_reach_node < min_cost:
-                min_cost = frontier[i].heuristic_cost + frontier[i].cost_to_reach_node
-                min_index = i
-
         # expanding node with the least heuristic cost
-        node_to_expand = frontier.pop(min_index)
+        node_to_expand = heappop(frontier)[2]
         visited_nodes.append(node_to_expand)
         if search_depth < node_to_expand.cost_to_reach_node:
             search_depth = node_to_expand.cost_to_reach_node
@@ -206,8 +200,8 @@ def solve_puzzle_A_star(puzzle, metric_type):
             child_node = Node(child_as_puzzle, node_to_expand, node_to_expand.cost_to_reach_node + 1, metric_type)
 
             exists_in_frontier_or_visited = False
-            for node in frontier:
-                if node.state == child_state:
+            for entry_tuple in frontier:
+                if entry_tuple[2].state == child_state:
                     exists_in_frontier_or_visited = True
                     break
 
@@ -217,7 +211,8 @@ def solve_puzzle_A_star(puzzle, metric_type):
                     break
 
             if not exists_in_frontier_or_visited:
-                frontier.append(child_node)
+                heappush(frontier, (child_node.heuristic_cost + child_node.cost_to_reach_node, frontier_insertion_count, child_node))
+                frontier_insertion_count += 1
 
         print(f"\nExplored Node no: {trial_no}")
         node_in_puzzle_form.print_puzzle()
