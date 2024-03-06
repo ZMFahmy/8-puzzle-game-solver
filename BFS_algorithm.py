@@ -156,6 +156,10 @@ def solve_puzzleBFS(puzzle):
     root = DFSNode(puzzle)
     root.depth=1
     visited_nodes.append(root)
+    path=[]
+    if is_matrix_in_list(root.state,SOLUTION):
+        path.append(root.state)
+        return path
     for child in root.children:
         pu=Puzzle()
         # print("#########")
@@ -195,4 +199,9 @@ def solve_puzzleBFS(puzzle):
 
 
 
-
+# p=Puzzle()
+# print(p.state)
+# p.set_state([['1','0','3'],['2','4','5'],['6','7','8']])
+# print(p.state)
+# print(solve_puzzleBFS(p))
+#

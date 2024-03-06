@@ -121,17 +121,14 @@ class DFSNode:
 import time
 def visit(p,visited_nodes,frontier):
     # time.sleep(5)
-    # if p.depth>25:
-    #     return False
     if len(visited_nodes)%1000==0:
-        print(len(visited_nodes))
+        p=frontier.pop(0)
 
 
     # print_mat(p)
-
     visited_nodes.append(p)
     if is_matrix_in_list(p.state, SOLUTION):
-        print("done")
+        # print("done")
         return True
     else:
 
@@ -159,6 +156,10 @@ def solve_puzzleDFS(puzzle):
     root = DFSNode(puzzle)
     root.depth=1
     visited_nodes.append(root)
+    path=[]
+    if is_matrix_in_list(root.state,SOLUTION):
+        path.append(root.state)
+        return path
     for child in root.children:
         pu=Puzzle()
         # print("#########")
@@ -168,6 +169,7 @@ def solve_puzzleDFS(puzzle):
         frontier.append(ch)
         # pu.print_puzzle()
     solveable=False
+    path=[]
     while len(frontier)>0:
         if visit(frontier.pop(), visited_nodes, frontier):
             solveable=True
@@ -175,15 +177,31 @@ def solve_puzzleDFS(puzzle):
 
 
     if solveable==True:
-        print("solved succesfully ")
-        print(visited_nodes[-1].depth)
+        # print("solved succesfully ")
+        # print(visited_nodes[-1].depth)
         current=visited_nodes[-1]
         while current.parent:
-            print_mat(current)
-            print("###########################")
-            current=current.parent
+            # print_mat(current)
+            path.insert(0,current.state)
+            # print("###########################")
 
+            current=current.parent
+        # print(len(path))
+
+        return path
     else:
-        print("unable to solve")
+        return False
 
         print_mat(visited_nodes[0])
+
+
+
+
+
+
+p=Puzzle()
+print(p.state)
+p.set_state([['1','2','0'],['3','4','5'],['6','7','8']])
+print(p.state)
+print(solve_puzzleDFS(p))
+
