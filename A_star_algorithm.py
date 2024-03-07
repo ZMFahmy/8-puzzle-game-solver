@@ -153,6 +153,14 @@ def get_visited_nodes_states(visited_nodes):
     return states
 
 
+def state_to_string(puzzle_state):
+    state_string = ""
+    for i in range(3):
+        for j in range(3):
+            state_string += puzzle_state[i][j]
+    return state_string
+
+
 def get_path_to_goal(node):
     path = []  # path from end to start
     while node is not None:
@@ -170,11 +178,14 @@ def solve_puzzle_A_star(puzzle, metric_type):
     ]
     visited_nodes = []
     frontier = []  # heapq with items being tuples in the format (heuristic_cost, frontier_insertion_count, node)
+    visited_states_set = set()
+    frontier_states_set = set()
     search_depth = 0
     frontier_insertion_count = 1
 
     root = Node(puzzle, None, 0, metric_type)
     visited_nodes.append(root)
+    visited_states_set.add(state_to_string(root.state))
     if root.state == goal_state:
         return get_path_to_goal(root)
 
@@ -183,6 +194,7 @@ def solve_puzzle_A_star(puzzle, metric_type):
         child_as_puzzle.set_state(child_state)
         child_node = Node(child_as_puzzle, root, root.cost_to_reach_node + 1, metric_type)
         heappush(frontier, (child_node.heuristic_cost + child_node.cost_to_reach_node, frontier_insertion_count, child_node))
+        frontier_states_set.add(state_to_string(child_state))
         frontier_insertion_count += 1
 
     trial_no = 1
@@ -190,6 +202,7 @@ def solve_puzzle_A_star(puzzle, metric_type):
         # expanding node with the least heuristic cost
         node_to_expand = heappop(frontier)[2]
         visited_nodes.append(node_to_expand)
+        visited_states_set.add(state_to_string(node_to_expand.state))
         if search_depth < node_to_expand.cost_to_reach_node:
             search_depth = node_to_expand.cost_to_reach_node
         node_in_puzzle_form = Puzzle()
@@ -200,18 +213,12 @@ def solve_puzzle_A_star(puzzle, metric_type):
             child_node = Node(child_as_puzzle, node_to_expand, node_to_expand.cost_to_reach_node + 1, metric_type)
 
             exists_in_frontier_or_visited = False
-            for entry_tuple in frontier:
-                if entry_tuple[2].state == child_state:
-                    exists_in_frontier_or_visited = True
-                    break
-
-            for node in visited_nodes:
-                if node.state == child_state:
-                    exists_in_frontier_or_visited = True
-                    break
+            if state_to_string(child_state) in frontier_states_set or state_to_string(child_state) in visited_states_set:
+                exists_in_frontier_or_visited = True
 
             if not exists_in_frontier_or_visited:
                 heappush(frontier, (child_node.heuristic_cost + child_node.cost_to_reach_node, frontier_insertion_count, child_node))
+                frontier_states_set.add(state_to_string(child_state))
                 frontier_insertion_count += 1
 
         print(f"\nExplored Node no: {trial_no}")
