@@ -150,8 +150,8 @@ def visit(p,visited_nodes,frontier,VisitedSet):
     # if len(visited_nodes)%1000==0:
     #     print(len(visited_nodes))
 
-    # print("exploring node ",len(visited_nodes))
-    # print_mat(p)
+    print("exploring node ",len(visited_nodes))
+    print_mat(p)
     visited_nodes.append(p)
     VisitedSet.add(reshape(p.state))
     if is_matrix_in_list(p.state, SOLUTION):
@@ -188,7 +188,7 @@ def solve_puzzleBFS(puzzle):
     VisitedSet.add(reshape(root.state))
     path=[]
     if is_matrix_in_list(root.state,SOLUTION):
-        path.append(root.state)
+        # path.append(root.state)
         return path
     for child in root.children:
         pu=Puzzle()

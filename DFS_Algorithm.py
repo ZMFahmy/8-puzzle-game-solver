@@ -71,6 +71,7 @@ def get_children(state):
         list.append(temp2)
         for i in range(0, 2):
             index = random.randrange(len(list))
+            # index=1-i
             children.append(list.pop(index))
 
     elif (row == 1) and (column == 1):
@@ -90,6 +91,7 @@ def get_children(state):
         list.append(temp4)
         for i in range(0, 4):
             index = random.randrange(len(list))
+            # index=3-i
             children.append(list.pop(index))
     else:
         # temp1 = copy.deepcopy(state)
@@ -130,6 +132,7 @@ def get_children(state):
         list.append(temp2)
         for i in range(0, 3):
             index = random.randrange(len(list))
+            # index=2-i
             children.append(list.pop(index))
     return children
 
@@ -150,8 +153,8 @@ def visit(p,visited_nodes,frontier,VisitedSet):
     # if len(visited_nodes)%1000==0:
     #     print(len(visited_nodes))
 
-    # print("exploring node ",len(visited_nodes))
-    # print_mat(p)
+    print("exploring node ",len(visited_nodes))
+    print_mat(p)
     visited_nodes.append(p)
     VisitedSet.add(reshape(p.state))
     if is_matrix_in_list(p.state, SOLUTION):
@@ -188,7 +191,7 @@ def solve_puzzleDFS(puzzle):
     VisitedSet.add(reshape(root.state))
     path=[]
     if is_matrix_in_list(root.state,SOLUTION):
-        path.append(root.state)
+        # path.append(root.state)
         return path
     for child in root.children:
         pu=Puzzle()
